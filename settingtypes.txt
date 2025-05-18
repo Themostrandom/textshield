@@ -1,0 +1,22 @@
+# General bad words detection
+textshield_badword_warning_label = string Inappropriate language detected! Please remain respectful.
+textshield_badword_warning_button = string Understood
+textshield_log_badword_detected = string Bad word detected: 
+
+# Caps filter
+textshield_caps_warning_label = string Please do not write in ALL CAPS, it is considered shouting.
+textshield_caps_warning_button = string Understood
+textshield_log_excessive_caps = string Excessive caps: 
+
+# Anti-spam filter
+textshield_spam_delay = int 3
+textshield_spam_warning_label = string Please do not spam the chat or repeat characters.
+textshield_spam_warning_button = string Understood
+textshield_log_spam_fast = string Spam detected (message too fast): 
+textshield_log_spam_repeat = string Spam detected (repeated characters): 
+
+# Mute
+textshield_mute_1h = int 3600
+textshield_mute_12h = int 43200
+textshield_mute_1d = int 86400
+textshield_mute_7d = int 604800

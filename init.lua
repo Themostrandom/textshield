@@ -4,7 +4,8 @@ local badwords = {}
 local specific_words = {
     ["wtf"] = true,
     ["mf"] = true,
-    ["tf"] = true
+    ["tf"] = true,
+    ["mtf"] = true
 }
 
 

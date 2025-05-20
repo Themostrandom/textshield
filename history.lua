@@ -73,15 +73,20 @@ function history.log(player_name, message)
     local count = get_warn_count(player_name) + 1
     set_warn_count(player_name, count)
 
-    if count == 5 then
-        mute_player(player_name, MUTE_1H, "5 warnings")
-    elseif count == 7 then
-        mute_player(player_name, MUTE_12H, "7 warnings")
-    elseif count == 10 then
-        mute_player(player_name, MUTE_1D, "10 warnings")
-    elseif count == 15 then
-        mute_player(player_name, MUTE_7D, "15 warnings")
-    end
+	if count == 5 then
+		mute_player(player_name, MUTE_1H, "5 warnings")
+		history.log(player_name, "Automatically muted for 1 hour (5 warnings)")
+	elseif count == 7 then
+		mute_player(player_name, MUTE_12H, "7 warnings")
+		history.log(player_name, "Automatically muted for 12 hours (7 warnings)")
+	elseif count == 10 then
+		mute_player(player_name, MUTE_1D, "10 warnings")
+		history.log(player_name, "Automatically muted for 1 day (10 warnings)")
+	elseif count == 15 then
+		mute_player(player_name, MUTE_7D, "15 warnings")
+		history.log(player_name, "Automatically muted for 7 days (15 warnings)")
+	end
+
 end
 
 function history.get(player_name)
@@ -158,5 +163,62 @@ minetest.register_chatcommand("ts_clear", {
         return true, minetest.colorize("#00FF00", string.format(MSG_HISTORY_CLEARED, param))
     end
 })
+
+local function parse_duration(duration_str)
+    local num = tonumber(duration_str:sub(1, -2))
+    local unit = duration_str:sub(-1)
+
+    if not num or not unit then return nil end
+
+    if unit == "h" then
+        return num * 3600
+    elseif unit == "d" then
+        return num * 86400
+    elseif unit == "m" then
+        return num * 2592000
+    else
+        return nil
+    end
+end
+
+minetest.register_chatcommand("mute", {
+    params = "<player> <duration (e.g., 1h, 2d, 1m)> <reason>",
+    description = "Mute a player for a specified duration with a reason",
+    privs = {kick = true},
+    func = function(name, param)
+        local target, duration_str, reason = param:match("^(%S+)%s+(%S+)%s+(.+)$")
+        if not target or not duration_str or not reason then
+            return false, minetest.colorize("#FF0000", "Usage: /mute <player> <duration> <reason>")
+        end
+
+        local duration = parse_duration(duration_str)
+        if not duration then
+            return false, minetest.colorize("#FF0000", "Invalid duration format. Use h (hour), d (day), m (month)")
+        end
+
+        mute_player(target, duration, reason)
+        history.log(target, string.format("Manually muted for %s due to: %s", duration_str, reason))
+        return true, minetest.colorize("#00FF00", target .. " has been muted for " .. duration_str)
+    end
+})
+
+minetest.register_chatcommand("unmute", {
+    params = "<player>",
+    description = "Unmute a player manually",
+    privs = {kick = true},
+    func = function(name, param)
+        if param == "" then
+            return false, minetest.colorize("#FF0000", "Usage: /unmute <player>")
+        end
+        set_mute_end(param, 0)
+        local privs = minetest.get_player_privs(param)
+        privs.shout = true
+        minetest.set_player_privs(param, privs)
+        history.log(param, "Unmuted manually")
+        minetest.chat_send_player(param, "[TextShield] You have been unmuted.")
+        return true, minetest.colorize("#00FF00", param .. " has been unmuted.")
+    end
+})
+
 
 return history

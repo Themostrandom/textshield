@@ -120,12 +120,12 @@ end)
 
 minetest.register_on_chatcommand(function(player_name, command)
     if is_player_muted(player_name) then
-        local blocked_commands = {
-            me = true,
-            t = true,
-            m = true,
-            msg = true,
-        }
+	local blocked_commands_str = minetest.settings:get("textshield_blocked_commands") or "me,t,m,msg"
+	local blocked_commands = {}
+	for cmd in blocked_commands_str:gmatch("[^,%s]+") do
+		blocked_commands[cmd] = true
+	end
+
         if blocked_commands[command] then
             minetest.chat_send_player(player_name, "You cannot use this command while muted.")
             return true

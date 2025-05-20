@@ -20,3 +20,5 @@ textshield_mute_1h = int 3600
 textshield_mute_12h = int 43200
 textshield_mute_1d = int 86400
 textshield_mute_7d = int 604800
+
+textshield_blocked_commands = me,t,m,msg

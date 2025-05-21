@@ -28,6 +28,17 @@ local lookalike_map = {
     ["8"] = "b"
 }
 
+local cyrillic_map = {
+    ["а"] = "a", ["б"] = "b", ["в"] = "v", ["г"] = "g", ["д"] = "d",
+    ["е"] = "e", ["ё"] = "e", ["ж"] = "zh", ["з"] = "z", ["и"] = "i",
+    ["й"] = "i", ["к"] = "k", ["л"] = "l", ["м"] = "m", ["н"] = "n",
+    ["о"] = "o", ["п"] = "p", ["р"] = "r", ["с"] = "s", ["т"] = "t",
+    ["у"] = "u", ["ф"] = "f", ["х"] = "h", ["ц"] = "ts", ["ч"] = "ch",
+    ["ш"] = "sh", ["щ"] = "sch", ["ы"] = "y", ["э"] = "e", ["ю"] = "yu",
+    ["я"] = "ya", ["ь"] = "", ["ъ"] = ""
+}
+
+
 local accent_map = {
     ["à"] = "a", ["â"] = "a", ["ä"] = "a", ["á"] = "a", ["ã"] = "a",
     ["ç"] = "c",
@@ -74,11 +85,14 @@ local function normalize_text(text)
     local result = {}
     for c in utf8_chars(text) do
         local no_accent = accent_map[c] or c
-        local normalized = lookalike_map[no_accent] or no_accent
+        local translit = cyrillic_map[no_accent] or no_accent
+        local normalized = lookalike_map[translit] or translit
         table.insert(result, normalized)
     end
     return table.concat(result)
 end
+
+
 
 
 local function compact_text(text)
@@ -97,7 +111,7 @@ local function load_badwords()
         local file = io.open(path, "r")
         if file then
             for line in file:lines() do
-                table.insert(badwords, line:lower())
+		table.insert(badwords, normalize_text(line))
             end
             file:close()
         end

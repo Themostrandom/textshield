@@ -5,6 +5,7 @@ local specific_words = {
     ["wtf"] = true,
     ["mf"] = true,
     ["tf"] = true,
+    ["fdp"] = true,
     ["mtf"] = true
 }
 
@@ -185,3 +186,20 @@ minetest.register_on_chat_message(function(name, message)
         return true
     end
 end)
+
+minetest.register_on_prejoinplayer(function(name, ip)
+    local normalized_name = normalize_text(name)
+    local compacted_name = compact_text(name)
+
+    if #normalized_name < 3 then
+        return
+    end
+
+    for _, badword in ipairs(badwords) do
+        if is_similar(normalized_name, badword) or compacted_name:find(badword, 1, true) then
+            minetest.log("action", "[textshield] Refused player '" .. name .. "' (contains badword: " .. badword .. ")")
+            return "Access denied: inappropriate username."
+        end
+    end
+end)
+

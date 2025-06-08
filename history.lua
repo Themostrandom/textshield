@@ -15,8 +15,7 @@ local MUTE_7D = tonumber(minetest.settings:get("textshield_mute_7d")) or 604800
 
 local function get_warn_count(player_name)
     local key = "warn_count:" .. player_name
-    local count = storage:get_int(key)
-    return count or 0
+    return storage:get_int(key)
 end
 
 local function set_warn_count(player_name, count)
@@ -26,8 +25,7 @@ end
 
 local function get_mute_end(player_name)
     local key = "mute_end:" .. player_name
-    local ts = storage:get_int(key)
-    return ts or 0
+    return storage:get_int(key)
 end
 
 local function set_mute_end(player_name, timestamp)
@@ -53,15 +51,23 @@ local function mute_player(player_name, time_seconds, reason)
     end
 
     minetest.after(time_seconds, function()
-        local current_privs = minetest.get_player_privs(player_name)
-        current_privs.shout = true
-        minetest.set_player_privs(player_name, current_privs)
-        set_mute_end(player_name, 0)
-        minetest.chat_send_player(player_name, "[TextShield] Your mute has expired.")
+        if get_mute_end(player_name) == mute_end_time then
+            local current_privs = minetest.get_player_privs(player_name)
+            current_privs.shout = true
+            minetest.set_player_privs(player_name, current_privs)
+            set_mute_end(player_name, 0)
+            minetest.chat_send_player(player_name, "[TextShield] Your mute has expired.")
+        end
     end)
 end
 
+local logging_flag = {}
+
 function history.log(player_name, message)
+    if logging_flag[player_name] then
+        return
+    end
+
     local key = "log:" .. player_name
     local current = storage:get_string(key)
     local time = os.date("%Y-%m-%d %H:%M:%S")
@@ -73,20 +79,27 @@ function history.log(player_name, message)
     local count = get_warn_count(player_name) + 1
     set_warn_count(player_name, count)
 
-	if count == 5 then
-		mute_player(player_name, MUTE_1H, "5 warnings")
-		history.log(player_name, "Automatically muted for 1 hour (5 warnings)")
-	elseif count == 7 then
-		mute_player(player_name, MUTE_12H, "7 warnings")
-		history.log(player_name, "Automatically muted for 12 hours (7 warnings)")
-	elseif count == 10 then
-		mute_player(player_name, MUTE_1D, "10 warnings")
-		history.log(player_name, "Automatically muted for 1 day (10 warnings)")
-	elseif count == 15 then
-		mute_player(player_name, MUTE_7D, "15 warnings")
-		history.log(player_name, "Automatically muted for 7 days (15 warnings)")
-	end
-
+    if count == 5 then
+        logging_flag[player_name] = true
+        mute_player(player_name, MUTE_1H, "5 warnings")
+        storage:set_string(key, storage:get_string(key) .. "\n" .. string.format("[%s] Automatically muted for 1 hour (5 warnings)", time))
+        logging_flag[player_name] = false
+    elseif count == 7 then
+        logging_flag[player_name] = true
+        mute_player(player_name, MUTE_12H, "7 warnings")
+        storage:set_string(key, storage:get_string(key) .. "\n" .. string.format("[%s] Automatically muted for 12 hours (7 warnings)", time))
+        logging_flag[player_name] = false
+    elseif count == 10 then
+        logging_flag[player_name] = true
+        mute_player(player_name, MUTE_1D, "10 warnings")
+        storage:set_string(key, storage:get_string(key) .. "\n" .. string.format("[%s] Automatically muted for 1 day (10 warnings)", time))
+        logging_flag[player_name] = false
+    elseif count == 15 then
+        logging_flag[player_name] = true
+        mute_player(player_name, MUTE_7D, "15 warnings")
+        storage:set_string(key, storage:get_string(key) .. "\n" .. string.format("[%s] Automatically muted for 7 days (15 warnings)", time))
+        logging_flag[player_name] = false
+    end
 end
 
 function history.get(player_name)
@@ -118,22 +131,24 @@ minetest.register_on_chat_message(function(name, message)
     return false
 end)
 
-minetest.register_on_chatcommand(function(player_name, command)
-    if is_player_muted(player_name) then
-	local blocked_commands_str = minetest.settings:get("textshield_blocked_commands") or "me,t,m,msg"
-	local blocked_commands = {}
-	for cmd in blocked_commands_str:gmatch("[^,%s]+") do
-		blocked_commands[cmd] = true
-	end
+local blocked_commands_str = minetest.settings:get("textshield_blocked_commands") or "me,t,m,msg"
+local blocked_commands = {}
+for cmd in blocked_commands_str:gmatch("[^,%s]+") do
+    blocked_commands[cmd] = true
+end
 
-        if blocked_commands[command] then
-            minetest.chat_send_player(player_name, "You cannot use this command while muted.")
-            return true
+minetest.register_on_chat_message(function(name, message)
+    if is_player_muted(name) then
+        if message:sub(1,1) == "/" then
+            local cmd = message:match("^/(%S+)")
+            if cmd and blocked_commands[cmd] then
+                minetest.chat_send_player(name, "[TextShield] You cannot use this command while muted.")
+                return true
+            end
         end
     end
     return false
 end)
-
 
 minetest.register_chatcommand("ts", {
     params = "<player>",
@@ -166,7 +181,7 @@ minetest.register_chatcommand("ts_clear", {
 
 local function parse_duration(duration_str)
     local num = tonumber(duration_str:sub(1, -2))
-    local unit = duration_str:sub(-1)
+    local unit = duration_str:sub(-1):lower()
 
     if not num or not unit then return nil end
 
@@ -219,6 +234,5 @@ minetest.register_chatcommand("unmute", {
         return true, minetest.colorize("#00FF00", param .. " has been unmuted.")
     end
 })
-
 
 return history

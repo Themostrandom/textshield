@@ -6,10 +6,20 @@ local MSG_CAPS_WARNING_BUTTON = minetest.settings:get("textshield_caps_warning_b
 local MSG_LOG_EXCESSIVE_CAPS = minetest.settings:get("textshield_log_excessive_caps") or "Excessive caps: "
 
 local function is_all_caps(message)
-    local letters = message:gsub("[^%a]", "")
+    local letters = {}
+    for c in message:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+        if c:match("[%aА-Яа-яЁё]") then
+            table.insert(letters, c)
+        end
+    end
+
     if #letters < 5 then return false end
-    return letters:upper() == letters
+
+    local joined = table.concat(letters)
+    return joined == joined:upper()
 end
+
+
 
 local function show_caps_warning(player_name)
     local formspec = string.format([[

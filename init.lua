@@ -6,7 +6,9 @@ local specific_words = {
     ["mf"] = true,
     ["tf"] = true,
     ["fdp"] = true,
-    ["mtf"] = true
+    ["mtf"] = true,
+	["nig"] = true,
+	["fu"] = true
 }
 
 
@@ -36,8 +38,10 @@ local cyrillic_map = {
     ["о"] = "o", ["п"] = "p", ["р"] = "r", ["с"] = "s", ["т"] = "t",
     ["у"] = "u", ["ф"] = "f", ["х"] = "h", ["ц"] = "ts", ["ч"] = "ch",
     ["ш"] = "sh", ["щ"] = "sch", ["ы"] = "y", ["э"] = "e", ["ю"] = "yu",
-    ["я"] = "ya", ["ь"] = "", ["ъ"] = ""
+    ["я"] = "ya", ["ь"] = "", ["ъ"] = "", ["ј"] = "j", ["љ"] = "lj",
+    ["њ"] = "nj", ["ћ"] = "ć", ["ђ"] = "đ", ["џ"] = "dž"
 }
+
 
 
 local accent_map = {
@@ -61,7 +65,7 @@ local accent_map = {
 local BADWORD_DAMAGE = tonumber(minetest.settings:get("badword_damage")) or 6
 local BADWORD_WARNING = minetest.settings:get("badword_warning") or "Inappropriate language detected! Please remain respectful."
 local SIMILARITY_THRESHOLD = tonumber(minetest.settings:get("similarity_threshold")) or 0.75
-local BADWORD_LANGUAGES = minetest.settings:get("badword_languages") or "ar,de,en,es,fr,it,ja,ko,ru,zh"
+local BADWORD_LANGUAGES = minetest.settings:get("badword_languages") or "ar,de,en,es,fr,it,ja,ko,ru,zh,el"
 
 local function utf8_chars(text)
     local i = 1

@@ -200,9 +200,11 @@ minetest.register_on_prejoinplayer(function(name, ip)
     end
 
     for _, badword in ipairs(badwords) do
-        if is_similar(normalized_name, badword) or compacted_name:find(badword, 1, true) then
-            minetest.log("action", "[textshield] Refused player '" .. name .. "' (contains badword: " .. badword .. ")")
-            return "Access denied: inappropriate username."
+        if #badword >= 4 then
+            if normalized_name == badword or compacted_name == badword then
+                minetest.log("action", "[textshield] Refused player '" .. name .. "' (contains badword: " .. badword .. ")")
+                return "Access denied: inappropriate username."
+            end
         end
     end
 end)

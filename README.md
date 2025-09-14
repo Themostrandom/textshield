@@ -77,7 +77,7 @@ textshield/
 
 ## License
 
-This project is licensed under the terms described in the [LICENSE](textshield/LICENSE) file.
+This project is licensed under the terms described in the [LICENSE](https://github.com/Themostrandom/textshield/blob/main/LICENSE) file.
 
 ---
 
@@ -95,4 +95,4 @@ To contribute, fork this repository, make your changes, and submit a pull reques
 
 ## Author
 
-Developed by **\Themostrandom01**.
+Developed by **\[Your Name / Team]**.

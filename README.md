@@ -95,4 +95,4 @@ To contribute, fork this repository, make your changes, and submit a pull reques
 
 ## Author
 
-Developed by **\[Your Name / Team]**.
+Developed by **Themostrandom01**.

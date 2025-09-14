@@ -8,6 +8,9 @@ local specific_words = {
     ["fdp"] = true,
     ["mtf"] = true,
 	["nig"] = true,
+	["sht"] = true,
+	["fok"] = true,
+	["fuk"] = true,
 	["fu"] = true
 }
 
@@ -28,7 +31,8 @@ local lookalike_map = {
     ["5"] = "s",
     ["4"] = "a",
     ["9"] = "g",
-    ["8"] = "b"
+    ["8"] = "b",
+	["£"] = "f"
 }
 
 local cyrillic_map = {
@@ -58,7 +62,7 @@ local accent_map = {
     ["Î"] = "i", ["Ï"] = "i", ["Í"] = "i",
     ["Ô"] = "o", ["Ö"] = "o", ["Ò"] = "o", ["Ó"] = "o", ["Õ"] = "o",
     ["Ù"] = "u", ["Û"] = "u", ["Ü"] = "u", ["Ú"] = "u",
-    ["Ý"] = "y", ["Ÿ"] = "y",
+    ["Ý"] = "y", ["Ÿ"] = "y", ["ć"] = "c", ["į"] = "i",
 }
 
 
@@ -103,7 +107,6 @@ end
 local function compact_text(text)
     return normalize_text(text:gsub("[^%w]", ""))
 end
-
 
 
 local function load_badwords()

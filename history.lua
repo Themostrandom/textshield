@@ -13,6 +13,11 @@ local MUTE_12H = tonumber(minetest.settings:get("textshield_mute_12h")) or 43200
 local MUTE_1D = tonumber(minetest.settings:get("textshield_mute_1d")) or 86400
 local MUTE_7D = tonumber(minetest.settings:get("textshield_mute_7d")) or 604800
 
+minetest.register_privilege("mute", {
+    description = "Gives the right to mute a player and view their history",
+    give_to_singleplayer = false,
+})
+
 local function get_warn_count(player_name)
     local key = "warn_count:" .. player_name
     return storage:get_int(key)
@@ -153,7 +158,7 @@ end)
 minetest.register_chatcommand("ts", {
     params = "<player>",
     description = CMD_TS_DESC,
-    privs = {kick = true},
+    privs = {mute = true},
     func = function(name, param)
         if param == "" then
             return false, minetest.colorize("#FF0000", MSG_USAGE_TS)
@@ -169,7 +174,7 @@ minetest.register_chatcommand("ts", {
 minetest.register_chatcommand("ts_clear", {
     params = "<player>",
     description = CMD_TS_CLEAR_DESC,
-    privs = {ban = true},
+    privs = {server = true},
     func = function(name, param)
         if param == "" then
             return false, minetest.colorize("#FF0000", MSG_USAGE_TS_CLEAR)
@@ -199,7 +204,7 @@ end
 minetest.register_chatcommand("mute", {
     params = "<player> <duration (e.g., 1h, 2d, 1m)> <reason>",
     description = "Mute a player for a specified duration with a reason",
-    privs = {kick = true},
+    privs = {mute = true},
     func = function(name, param)
         local target, duration_str, reason = param:match("^(%S+)%s+(%S+)%s+(.+)$")
         if not target or not duration_str or not reason then
@@ -220,7 +225,7 @@ minetest.register_chatcommand("mute", {
 minetest.register_chatcommand("unmute", {
     params = "<player>",
     description = "Unmute a player manually",
-    privs = {kick = true},
+    privs = {mute = true},
     func = function(name, param)
         if param == "" then
             return false, minetest.colorize("#FF0000", "Usage: /unmute <player>")

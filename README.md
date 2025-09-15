@@ -20,7 +20,7 @@ TextShield is a Lua-based **anti-spam and chat moderation mod** for [Minetest](h
 1. Download or clone this repository into your Minetest `mods/` directory:
 
    ```bash
-   git clone https://github.com/yourusername/textshield.git
+   git clone https://github.com/Themostrandom/textshield.git
    ```
 
 2. Ensure the folder is named `textshield/`.
